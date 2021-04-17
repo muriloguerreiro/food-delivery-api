@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.muriloguerreiro.fooddelivery.domain.exception.DomainException;
 import com.muriloguerreiro.fooddelivery.domain.model.Client;
 import com.muriloguerreiro.fooddelivery.domain.repository.ClientRepository;
+import com.muriloguerreiro.fooddelivery.domain.service.ClientRegisterService;
 
 @RestController
 @RequestMapping("/clients")
@@ -27,6 +29,9 @@ public class ClientController {
 	
 	@Autowired
 	private ClientRepository clientRepository;
+	
+	@Autowired
+	private ClientRegisterService clientRegisterService;
 	
 	@GetMapping
 	public List<Client> listClients() {
@@ -47,7 +52,13 @@ public class ClientController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Client createClient(@Valid @RequestBody Client client) {
-		return clientRepository.save(client);
+		Client existingClient = clientRepository.findByEmail(client.getEmail());
+		
+		if (existingClient != null && !existingClient.equals(client)) {
+			throw new DomainException("Informed email is already registered.");
+		}
+		
+		return clientRegisterService.save(client);
 	}
 	
 	@PutMapping("/{id}")
@@ -58,7 +69,7 @@ public class ClientController {
 		}
 		
 		client.setId(id);
-		client = clientRepository.save(client);
+		client = clientRegisterService.save(client);
 		
 		return ResponseEntity.ok(client);
 	}
@@ -70,7 +81,7 @@ public class ClientController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		clientRepository.deleteById(id);
+		clientRegisterService.delete(id);
 		
 		return ResponseEntity.noContent().build();
 	}
