@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Client {
@@ -12,11 +15,29 @@ public class Client {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotBlank
+	@Size(max = 60)
 	private String name;
+	
+	@NotBlank
+	@Size(max = 30)
 	private String document;
+	
+	@NotBlank
+	@Size(max = 30)
 	private String phone;
+	
+	@NotBlank
+	@Size(max = 10)
 	private String birth;
+	
+	@NotBlank
+	@Email
+	@Size(max = 60)
 	private String email;
+	
+	@NotBlank
+	@Size(max = 60)
 	private String password;
 	
 	public Long getId() {
